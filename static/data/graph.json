@@ -1,6 +1,6 @@
 {
   "nodes": [
-    { "key": 1, "name": "Miton C", "type": "company", "style": "company" },
+    { "key": 1, "name": "Miton C", "type": "company", "style": "companyTop" },
     { "key": 2, "name": "M unchained SE", "type": "company", "style": "company" },
     { "key": 3, "name": "M unchained 2/10 O/U s.r.o.", "type": "company", "style": "company" },
     { "key": 4, "name": "2/10 O/U Limited GIB", "type": "company", "style": "company" },
