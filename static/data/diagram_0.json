@@ -1,0 +1,13 @@
+{
+  "class": "go.GraphLinksModel",
+  "nodeDataArray": [
+    { "key": 1, "text": "Start", "color": "lightgreen" },
+    { "key": 2, "text": "Process", "color": "lightblue" },
+    { "key": 3, "text": "Decision", "color": "orange" }
+  ],
+  "linkDataArray": [
+    { "from": 1, "to": 2 },
+    { "from": 2, "to": 3 }
+  ]
+}
+
