@@ -1,0 +1,19 @@
+/* styles.css */
+
+.company-node {
+  fill: #cceeff;
+  stroke: #3399cc;
+  stroke-width: 2;
+}
+
+.person-node {
+  fill: #d4f4dd;
+  stroke: #2a6b42;
+  stroke-width: 2;
+}
+
+.note-node {
+  fill: #fff4b5;
+  stroke: #e0b400;
+  stroke-dasharray: 4, 2;
+}

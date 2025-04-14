@@ -2,57 +2,97 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Styled GoJS Diagram</title>
+  <title>Graph Viewer</title>
   <script src="/static/gojs/release/go-debug.js"></script>
+  <link rel="stylesheet" href="/static/css/styles.css">
   <style>
-    body {
+    html, body {
+      height: 100%;
+      margin: 0;
       font-family: sans-serif;
     }
-    #myDiagramDiv {
+    #diagramDiv {
       width: 100%;
-      height: 600px;
-      border: 2px solid #555;
+      height: 100%;
+      background-color: #f9f9f9;
     }
   </style>
 </head>
 <body>
-  <h2>Custom Styled Diagram</h2>
-  <div id="myDiagramDiv"></div>
+  <div id="diagramDiv"></div>
 
   <script>
     const $ = go.GraphObject.make;
-
-    const myDiagram = $(go.Diagram, "myDiagramDiv", {
-      "undoManager.isEnabled": true
+const styles = {
+  company: { fill: "#cceeff", stroke: "#3399cc", strokeWidth: 2 },
+  person:  { fill: "#d4f4dd", stroke: "#2a6b42", strokeWidth: 2 },
+  note:    { fill: "#fff4b5", stroke: "#e0b400", strokeDashArray: [4, 2] }
+};
+    const diagram = $(go.Diagram, "diagramDiv", {
+      layout: $(go.LayeredDigraphLayout, { direction: 0, layerSpacing: 50 })
     });
 
-    // Define custom style (you can expand this later)
-    myDiagram.nodeTemplate =
-      $(go.Node, "Auto",
-        $(go.Shape, "RoundedRectangle",
-          {
-            fill: "lightgray",
-            stroke: "black",
-            strokeWidth: 2
-          },
-          new go.Binding("fill", "color")
-        ),
-        $(go.TextBlock,
-          {
-            font: "bold 16px sans-serif",
-            margin: 8,
-            stroke: "#333"
-          },
-          new go.Binding("text", "text")
-        )
-      );
+    // Node templates
+    diagram.nodeTemplate =
+  $(go.Node, "Horizontal",
+    $("TreeExpanderButton", {
+      width: 14, height: 14
+    }),
+    $(go.Panel, "Auto",
+      $(go.Shape, "RoundedRectangle", {
+        name: "SHAPE",
+        fill: "white", stroke: "#ccc"
+      },
+        new go.Binding("", "", function (data, shape) {
+          const s = styles[data.style];
+          if (s) Object.assign(shape, s);
+          return null;
+        })
+      ),
+      $(go.TextBlock, { margin: 8, font: "bold 14px sans-serif" },
+        new go.Binding("text", "name"))
+    )
+  );
 
-    // Load from JSON file (mocked here, see Python section next)
-    fetch('/static/data/diagram.json')
-      .then(res => res.json())
+
+    function toggleVisibility(node, visible) {
+  // Hide/show immediate children (nodes this one links to)
+  diagram.findLinksOutOf(node).each(link => {
+    const child = link.toNode;
+    if (!child) return;
+    child.visible = visible;
+
+    // Recursively collapse children (optional, if you want full tree control)
+    if (!visible) {
+      toggleVisibility(child, false);
+    }
+  });
+
+  // Optional: also hide related notes
+  diagram.findNodesByExample({ relatedTo: node.data.key }).each(n => n.visible = visible);
+}
+
+diagram.addDiagramListener("TreeCollapsed", function (e) {
+  const node = e.subject;
+  toggleVisibility(node, false);
+});
+
+diagram.addDiagramListener("TreeExpanded", function (e) {
+  const node = e.subject;
+  toggleVisibility(node, true);
+});
+
+    // Load data from JSON
+    fetch('/static/data/graph.json')
+      .then(response => response.json())
       .then(data => {
-        myDiagram.model = go.Model.fromJson(data);
-      });
+        diagram.model = go.Model.fromJson({
+          class: "GraphLinksModel",
+          nodeDataArray: data.nodes,
+          linkDataArray: data.links
+        });
+      })
+      .catch(err => console.error("Failed to load JSON:", err));
   </script>
 </body>
 </html>

@@ -1,0 +1,49 @@
+{
+  "nodes": [
+    { "key": 1, "name": "Miton C", "type": "company", "style": "company" },
+    { "key": 2, "name": "M unchained SE", "type": "company", "style": "company" },
+    { "key": 3, "name": "M unchained 2/10 O/U s.r.o.", "type": "company", "style": "company" },
+    { "key": 4, "name": "2/10 O/U Limited GIB", "type": "company", "style": "company" },
+    { "key": 5, "name": "O/U Capital Limited", "type": "company", "style": "company" },
+    { "key": 6, "name": "LPs #1", "type": "company", "style": "company" },
+    { "key": 7, "name": "LPs #2", "type": "company", "style": "company" },
+    { "key": 8, "name": "LPs #3", "type": "company", "style": "company" },
+    { "key": 9, "name": "Martin Hála", "type": "person", "style": "person" },
+    { "key": 10, "name": "Vojtěch Piškora", "type": "person", "style": "person" },
+    { "key": 11, "name": "Stanislav Cífka", "type": "person", "style": "person" },
+    { "key": 12, "name": "Relic Capital Limited", "type": "company", "style": "company" },
+    { "key": 13, "name": "M Relic Capital s.r.o.", "type": "company", "style": "company" },
+    {
+      "key": 14,
+      "name": "Participation Shares - LPs, 2/10 O/U Ltd., MH, VP, SC",
+      "type": "note",
+      "style": "note",
+      "category": "note",
+      "relatedTo": 5,
+      "fromSpot": "RightCenter",
+      "toSpot": "BottomCenter"
+    }
+  ],
+  "links": [
+    { "from": 1, "to": 2 },
+    { "from": 2, "to": 3 },
+    { "from": 3, "to": 4 },
+    { "from": 4, "to": 5 },
+    { "from": 4, "to": 6 },
+    { "from": 4, "to": 7 },
+    { "from": 4, "to": 8 },
+    { "from": 4, "to": 9 },
+    { "from": 4, "to": 10 },
+    { "from": 4, "to": 11 },
+    { "from": 9, "to": 12 },
+    { "from": 10, "to": 12 },
+    { "from": 11, "to": 12 },
+    { "from": 12, "to": 5 },
+    { "from": 13, "to": 12 },
+    { "from": 6, "to": 5 },
+    { "from": 7, "to": 5 },
+    { "from": 8, "to": 5 },
+    { "from": 1, "to": 13 },
+    { "from": 14, "to": 5, "category": "noteLink" }
+  ]
+}
