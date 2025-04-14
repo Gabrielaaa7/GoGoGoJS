@@ -43,7 +43,11 @@
     { "from": 6, "to": 5 },
     { "from": 7, "to": 5 },
     { "from": 8, "to": 5 },
-    { "from": 1, "to": 13 },
-    { "from": 14, "to": 5, "category": "noteLink" }
+    {
+      "from": 1,
+      "to": 13,
+      "category": "weakLink"
+    },
+    { "from": 5, "to": 14, "category": "noteLink" }
   ]
 }

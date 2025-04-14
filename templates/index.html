@@ -23,66 +23,87 @@
 
   <script>
     const $ = go.GraphObject.make;
-const styles = {
-  company: { fill: "#cceeff", stroke: "#3399cc", strokeWidth: 2 },
-  person:  { fill: "#d4f4dd", stroke: "#2a6b42", strokeWidth: 2 },
-  note:    { fill: "#fff4b5", stroke: "#e0b400", strokeDashArray: [4, 2] }
-};
+
+    const styles = {
+      company: { fill: "#cceeff", stroke: "#3399cc", strokeWidth: 2 },
+      person:  { fill: "#d4f4dd", stroke: "#2a6b42", strokeWidth: 2 },
+      note:    { fill: "#fff4b5", stroke: "#e0b400", strokeDashArray: [4, 2] },
+    };
+
     const diagram = $(go.Diagram, "diagramDiv", {
       layout: $(go.LayeredDigraphLayout, { direction: 0, layerSpacing: 50 })
     });
 
-    // Node templates
+    // Generic dynamic node template
     diagram.nodeTemplate =
-  $(go.Node, "Horizontal",
-    $("TreeExpanderButton", {
-      width: 14, height: 14
-    }),
-    $(go.Panel, "Auto",
-      $(go.Shape, "RoundedRectangle", {
-        name: "SHAPE",
-        fill: "white", stroke: "#ccc"
-      },
-        new go.Binding("", "", function (data, shape) {
-          const s = styles[data.style];
-          if (s) Object.assign(shape, s);
-          return null;
-        })
-      ),
-      $(go.TextBlock, { margin: 8, font: "bold 14px sans-serif" },
-        new go.Binding("text", "name"))
-    )
-  );
+      $(go.Node, "Horizontal",
+        $("TreeExpanderButton", { width: 14, height: 14 }),
+        $(go.Panel, "Auto",
+          $(go.Shape, "RoundedRectangle", {
+            name: "SHAPE",
+            fill: "white",
+            stroke: "#ccc"
+          },
+            new go.Binding("", "", function (data, shape) {
+              const s = styles[data.style];
+              if (s) Object.assign(shape, s);
+              return null;
+            })
+          ),
+          $(go.TextBlock, { margin: 8, font: "bold 14px sans-serif" },
+            new go.Binding("text", "name"))
+        )
+      );
 
+    // Weak link: invisible link that still provides structural behavior
+    diagram.linkTemplateMap.add("weakLink",
+      $(go.Link,
+        { visible: false }
+      )
+    );
 
+    // Optional: visible note links
+    diagram.linkTemplateMap.add("noteLink",
+      $(go.Link, { selectable: false, routing: go.Link.Normal },
+        $(go.Shape, { stroke: "#999", strokeDashArray: [4, 2] }),
+        $(go.Shape, { toArrow: "OpenTriangle", stroke: "#999" })
+      )
+    );
+
+    // Default link
+    diagram.linkTemplate =
+      $(go.Link,
+        $(go.Shape),
+        $(go.Shape, { toArrow: "Standard" })
+      );
+
+    // Toggle visibility of connected children
     function toggleVisibility(node, visible) {
-  // Hide/show immediate children (nodes this one links to)
-  diagram.findLinksOutOf(node).each(link => {
-    const child = link.toNode;
-    if (!child) return;
-    child.visible = visible;
+      diagram.findLinksOutOf(node).each(link => {
+        const child = link.toNode;
+        if (!child) return;
+        child.visible = visible;
 
-    // Recursively collapse children (optional, if you want full tree control)
-    if (!visible) {
-      toggleVisibility(child, false);
+        if (!visible) {
+          toggleVisibility(child, false); // recursively collapse
+        }
+      });
+
+      // Also toggle related notes
+      diagram.findNodesByExample({ relatedTo: node.data.key }).each(n => n.visible = visible);
     }
-  });
 
-  // Optional: also hide related notes
-  diagram.findNodesByExample({ relatedTo: node.data.key }).each(n => n.visible = visible);
-}
+    diagram.addDiagramListener("TreeCollapsed", function (e) {
+      const node = e.subject;
+      toggleVisibility(node, false);
+    });
 
-diagram.addDiagramListener("TreeCollapsed", function (e) {
-  const node = e.subject;
-  toggleVisibility(node, false);
-});
+    diagram.addDiagramListener("TreeExpanded", function (e) {
+      const node = e.subject;
+      toggleVisibility(node, true);
+    });
 
-diagram.addDiagramListener("TreeExpanded", function (e) {
-  const node = e.subject;
-  toggleVisibility(node, true);
-});
-
-    // Load data from JSON
+    // Load JSON model
     fetch('/static/data/graph.json')
       .then(response => response.json())
       .then(data => {
